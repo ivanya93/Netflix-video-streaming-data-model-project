@@ -78,13 +78,13 @@ Netflix-like streaming companies face a fundamental challenge: they need to answ
 ## Key Features
 
 ✅ **Hierarchical Content Dimensions**
-- DimShow → DimSeason → DimEpisode (normalized TV content hierarchy)
+- DimShow → DimSeason → DimEpisode (normalized TV content hierarchy) -- We decided to use DimContent and not normalized these ones
 - DimMovie (flat, separate for movies)
 - Self-referencing ParentContentKey to handle hierarchy in flat denormalized DimContent option
 
 ✅ **Type 2 Slowly Changing Dimensions (SCD)**
 - DimUser: Track subscription tier changes, demographic updates
-- DimShow/Season/Episode: Track metadata changes
+- DimShow/Season/Episode: Track metadata changes (DimContent)
 - DimMovie: Track when movies added to platform
 - DimDevice: Track device capability evolution
 - Complete history: StartDate, EndDate, IsCurrent columns
@@ -116,9 +116,6 @@ Netflix-like streaming companies face a fundamental challenge: they need to answ
 | **DimTime** | 5 | Time-of-day patterns (peak watching hours) |
 | **DimUser** | 17 | User segmentation, behavior (Type 2 SCD) |
 | **DimSubscriptionType** | 14 | Pricing tiers, features, profitability |
-| **DimShow** | 25 | Series metadata, production costs (Type 2 SCD) |
-| **DimSeason** | 15 | Season details, episode counts (Type 2 SCD) |
-| **DimEpisode** | 24 | Episode details, runtime, ratings (Type 2 SCD) |
 | **DimMovie** | 22 | Movie metadata, licensing info (Type 2 SCD) |
 | **DimDevice** | 14 | Device tracking, delivery costs (Type 2 SCD) |
 | **DimSession** | 8 | Session ID mapping, handles operational ID recycling |
@@ -137,11 +134,9 @@ Netflix-like streaming companies face a fundamental challenge: they need to answ
     (Session Grain)   (Month Grain)
           ↑                 ↑             │
           │                 │             │
-    DimShow ──────┐         │             │
-    DimSeason ────┼─────────┼─────────────┤
-    DimEpisode ───┤         │             │
-                  │         │             │
-    DimMovie ─────┴─────────┼─────────────┤
+    DimContent ────┼─────────┼─────────────┤
+                   │         │             │
+    DimMovie ───-──┴─────────┼─────────────┤
                   │         │             │
               DimSession    │             │
                   │         │             │
@@ -253,7 +248,7 @@ ORDER BY CompletionRate_Pct DESC
 - StartDate/EndDate/IsCurrent columns
 
 ### 5. Hierarchical Content Dimensions
-- Show → Season → Episode hierarchy (TV series)
+- Show → Season → Episode hierarchy (TV series) -- DimContent (Denormalized)
 - Movie as separate dimension (movies are flat)
 - Foreign keys properly reference hierarchy
 
@@ -338,7 +333,7 @@ ORDER BY CompletionRate_Pct DESC
 - Surrogate keys isolate from source systems
 - Scalable to billions of rows per year
 
-✅ **Analytics-Friendly**
+✅ **Analytics**
 - Clear grain definitions
 - Additive facts for easy aggregation
 - Hierarchical dimensions for drill-down
@@ -389,7 +384,7 @@ ORDER BY CompletionRate_Pct DESC
 | Name | Role |
 |------|------|
 | Emmanuel Momoh | Team Member |
-| Ivana Ruiz | Project Lead & GitHub Manager |
+| Ivana Ruiz | Team Member & GitHub Manager |
 | Hugo Lima | Team Member |
 | Rita Sousa | Team Member |
 | Nikita Teterin | Team Member |
